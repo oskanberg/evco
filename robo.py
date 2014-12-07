@@ -28,7 +28,7 @@ LAME_DERIVATION = """package sample.evolved;\n
 POPULATION_SIZE = 20
 GENOME_SIZE = 800
 GENERATIONS = 50
-MUTATION_RATE = 0.05
+MUTATION_RATE = 0.1
 ROUNDS = 5
 
 generator = GramGen('robogram.json')
