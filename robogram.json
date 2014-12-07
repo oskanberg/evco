@@ -1,0 +1,133 @@
+{
+    "literal_int": [
+        "<nz_digit><literal_int>", 
+        "<digit>"
+    ], 
+    "digit": [
+        "0", 
+        "1", 
+        "2", 
+        "3", 
+        "4", 
+        "5", 
+        "6", 
+        "7", 
+        "8", 
+        "9"
+    ], 
+    "literal_boolean": [
+        "true", 
+        "false"
+    ], 
+    "statements": [
+        "<statement> <statements>", 
+        "<statement>"
+    ], 
+    "int": [
+        "<literal_int>", 
+        "getNumRounds()", 
+        "getNumSentries()", 
+        "getOthers()", 
+        "Math.round(<float>)"
+    ], 
+    "float": [
+        "<literal_float>", 
+        "getX()", 
+        "getY()", 
+        "getVelocity()", 
+        "getHeight()", 
+        "getHeading()", 
+        "getEnergy()", 
+        "getGunHeading()", 
+        "getGunCoolingRate()", 
+        "getBattleFieldHeight()", 
+        "getBattleFieldWidth()", 
+        "getGunHeat()", 
+        "getRadarHeading()", 
+        "getTime()", 
+        "(float) <int>"
+    ], 
+    "numeric": [
+        "<float>", 
+        "<int>"
+    ], 
+    "nz_digit": [
+        "1", 
+        "2", 
+        "3", 
+        "4", 
+        "5", 
+        "6", 
+        "7", 
+        "8", 
+        "9"
+    ], 
+    "literal_float": [
+        "<literal_int>.<fractional>"
+    ], 
+    "bool": [
+        "<literal_boolean>", 
+        "<expression_boolean>"
+    ], 
+    "expression_boolean": [
+        "<expression_boolean_term>"
+    ], 
+    "statement": [
+        "if (<expression_boolean>) {\n
+        <action>;\n
+      }\n
+      else {\n
+        <action>;\n
+      }", 
+        "<action>;"
+    ], 
+    "fractional": [
+        "<digit>", 
+        "<digit><digit>"
+    ], 
+    "action": [
+    	"<action>;<action>",
+        "setAhead(<float>)", 
+        "setBack(<float>)", 
+        "setStop()", 
+        "setResume()", 
+        "setTurnRight(<float>)", 
+        "setTurnLeft(<float>)", 
+        "setTurnGunLeft(<float>)", 
+        "setTurnGunRight(<float>)", 
+        "setTurnRadarLeft(<float>)", 
+        "setTurnRadarLeft(<float>)", 
+        "setAdjustGunForRobotTurn(<bool>)", 
+        "setAdjustRadarForRobotTurn(<bool>)", 
+        "setAdjustRadarForGunTurn(<bool>)", 
+        "fire(<float>)"
+    ], 
+    "m_run": [
+        "<statements>"
+    ], 
+    "main": ["package sample.evolved;\n
+    import robocode.*;\n
+    public class ##name## extends AdvancedRobot{\n
+    public void run() {\n
+		while (true) {\n
+			<m_run>\n
+			execute();\n
+		}\n
+	}\n
+	public void onScannedRobot(ScannedRobotEvent e) {\n
+		fire(1);\n
+	}\n
+	public void onHitByBullet(HitByBulletEvent e) { }\n
+	public void onHitRobot(HitRobotEvent e) { }\n
+	public void onHitWall(HitWallEvent e) { }\n
+}"
+    ], 
+    "expression_boolean_term": [
+        "<numeric> == <numeric>", 
+        "<numeric> != <numeric>", 
+        "<numeric> > <numeric>", 
+        "<numeric> >= <numeric>", 
+        "<numeric> < <numeric>", 
+        "<numeric> <= <numeric>"
+    ]
+}
