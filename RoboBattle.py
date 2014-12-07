@@ -3,12 +3,12 @@ import tempfile
 import os, stat
 from string import whitespace
 
-if os.environ['ROBOCODE_BOTS'] != '':
+if 'ROBOCODE_BOTS' in os.environ:
 	path_to_evolved_robots = os.environ['ROBOCODE_BOTS']
 else:
 	path_to_evolved_robots = '/home/oliver/projects/robocode/robots/'
 
-if os.environ['ROBOCODE'] != '':
+if 'ROBOCODE' in os.environ:
 	path_to_robocode	= os.environ['ROBOCODE']
 else:
 	path_to_robocode	= '/home/oliver/projects/robocode'

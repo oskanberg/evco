@@ -4,12 +4,12 @@ import re
 import os
 # import glob
 
-if os.environ['ROBOCODE_EVOLVED_BOTS'] != '':
+if 'ROBOCODE_EVOLVED_BOTS' in os.environ:
         path_to_evolved_robots = os.environ['ROBOCODE_EVOLVED_BOTS']
 else:
         path_to_evolved_robots = '/home/oliver/projects/robocode/robots/sample/evolved'
 
-if os.environ['ROBOCODE'] != '':
+if 'ROBOCODE' in os.environ:
         path_to_robocode        = os.environ['ROBOCODE']
 else:
         path_to_robocode        = '/home/oliver/projects/robocode'
