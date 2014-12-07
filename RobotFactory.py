@@ -4,8 +4,16 @@ import re
 import os
 # import glob
 
-path_to_evolved_robots = '/home/oliver/projects/robocode/robots/sample/evolved'
-path_to_robocode       = '/home/oliver/projects/robocode'
+if os.environ['ROBOCODE_EVOLVED_BOTS'] != '':
+        path_to_evolved_robots = os.environ['ROBOCODE_EVOLVED_BOTS']
+else:
+        path_to_evolved_robots = '/home/oliver/projects/robocode/robots/sample/evolved'
+
+if os.environ['ROBOCODE'] != '':
+        path_to_robocode        = os.environ['ROBOCODE']
+else:
+        path_to_robocode        = '/home/oliver/projects/robocode'
+
 
 class RobotFactory:
 
