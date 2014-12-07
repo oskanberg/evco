@@ -2,6 +2,8 @@ from GramGen import GramGen
 from RobotFactory import RobotFactory
 from RoboBattle import RoboBattle
 
+import csv
+
 from multiprocessing import Process, Queue
 import random
 
@@ -24,9 +26,10 @@ LAME_DERIVATION = """package sample.evolved;\n
 
 # NUM_PROCESSES = 4
 POPULATION_SIZE = 20
-GENOME_SIZE = 50
+GENOME_SIZE = 800
 GENERATIONS = 50
 MUTATION_RATE = 0.05
+ROUNDS = 5
 
 generator = GramGen('robogram.json')
 rf = RobotFactory()
@@ -48,7 +51,7 @@ class Robot:
 		self.lame = False
 
 	def register(self, generation):
-		derivation = generator.generate_from_seq(self.genome, 50)
+		derivation = generator.generate_from_seq(self.genome)
 		if len(derivation) == 0:
 			# derivation failed
 			self.lame = True
@@ -75,23 +78,28 @@ def generate_random_genome(length):
 	return [ random.randint(0, 255) for i in xrange(length) ]
 
 def get_next_gen(population, generation):
-	pairs = [ (robot.fullname, robot.fitness) for robot in population.itervalues()]
+	pairs = [ (robot.fullname, robot.fitness) for robot in population.itervalues() ]
 	highest = max([ p[1] for p in pairs ])
+	print 'higest fitness: ', highest
+	print 'avg.   fitness: ', sum([ p[1] for p in pairs ]) / len(pairs)
 	new_pop = {}
 	while len(new_pop) < POPULATION_SIZE:
 		selection = population[random.choice(population.keys())]
 		norm_fitness = selection.fitness / float(highest)
 		if random.random() < norm_fitness:
-			print 'selecting ', selection.fullname
 			new = Robot(mutate(selection.genome))
 			new.register(generation)
 			new_pop[new.fullname] = new
 	return new_pop
 
+def record_fitness(population, filename):
+	with open(filename, 'a') as f:
+		csv_writer = csv.writer(f)
+		csv_writer.writerow([ p.fitness for p in population.itervalues() ])
 
 def test_robot(robot_fullname, q):
-	result = rb.battle([robot_fullname, 'sample.Fire', 'sample.Walls', 'sample.RamFire'], rounds=1)
-	q.put((robot_fullname, result[robot_fullname]['total']))
+	result = rb.battle([robot_fullname, 'sample.Fire', 'sample.Walls', 'sample.RamFire'], rounds=ROUNDS)
+	q.put((robot_fullname, result[robot_fullname]['total']/float(ROUNDS)))
 
 population = {}
 #name:obj pairs
@@ -120,5 +128,6 @@ for generation in xrange(GENERATIONS):
 	for robot in population.itervalues():
 		print robot.fullname + " : " + str(robot.fitness)
 
+	record_fitness(population, '/tmp/fitness_record.csv')
 	population = get_next_gen(population, generation + 1)
 	rf.compile_generation(generation + 1)

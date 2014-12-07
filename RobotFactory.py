@@ -1,5 +1,6 @@
 
 import subprocess
+import re
 import os
 # import glob
 
@@ -17,6 +18,7 @@ class RobotFactory:
 	def add_robot(self, source, generation):
 		robot_name = 'gen' + str(generation) + '_' + str(self.num_robots)
 		source = source.replace('##name##', robot_name)
+		source = self.check_for_overflow(source)
 		java_path = path_to_evolved_robots + '/' + robot_name + '.java'
 		with open(java_path,'w') as f:
 			f.write(source)
@@ -35,6 +37,11 @@ robot.name=%s""" % (robot_name, robot_name)
 		self.num_robots += 1
 		return robot_name
 	
+
+	def check_for_overflow(self, source):
+		# replace large numbers
+		return re.sub(r'[\d]{6}', '1', source)
+
 	def compile_generation(self, generation):
 		cmd = [
 			"javac",

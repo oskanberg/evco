@@ -30,7 +30,10 @@ class GramGen():
 
 		return derivation
 
-	def generate_from_seq(self, sequence, iteration_limit):
+	def generate_from_seq(self, sequence, iteration_limit=-1):
+		if iteration_limit == -1:
+			iteration_limit = len(sequence)
+
 		sequence = sequence[:]
 		i = 0
 
