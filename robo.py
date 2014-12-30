@@ -28,9 +28,9 @@ LAME_DERIVATION = """package sample.evolved;\n
 POPULATION_SIZE = 20 
 GENOME_SIZE = 800
 GENERATIONS = 50
-MUTATION_RATE = 0.1
+MUTATION_RATE = 0.05
 ROUNDS = 5
-CROSSOVER_RATE = -1
+CROSSOVER_RATE = 0.2
 
 generator = GramGen('robogram.json')
 rf = RobotFactory()
@@ -71,9 +71,7 @@ def one_point_crossover(g1, g2):
 	g1 = g1[:]
 	g2 = g2[:]
 	point = random.randint(0, len(g1) - 1)
-	new = g1[0:point].append(g2[point:len(g2)])
-	assert len(new) == len(g1), 'crossover genome is not the same size'
-	return new
+	return g1[0:point] + g2[point:len(g2)]
 
 def generate_random_genome(length):
 	return [ random.randint(0, 255) for i in xrange(length) ]
