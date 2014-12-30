@@ -30,6 +30,7 @@ GENOME_SIZE = 800
 GENERATIONS = 50
 MUTATION_RATE = 0.1
 ROUNDS = 5
+CROSSOVER_RATE = -1
 
 generator = GramGen('robogram.json')
 rf = RobotFactory()
@@ -77,6 +78,14 @@ def one_point_crossover(g1, g2):
 def generate_random_genome(length):
 	return [ random.randint(0, 255) for i in xrange(length) ]
 
+def get_genome_fitness_proportionate(population):
+	highest = max([ robot.fitness for robot in population.itervalues() ])
+	while True:
+		selection = population[random.choice(population.keys())]
+		norm_fitness = selection.fitness / float(highest)
+		if random.random() < norm_fitness:
+			return selection.genome
+
 def get_next_gen(population, generation):
 	pairs = [ (robot.fullname, robot.fitness) for robot in population.itervalues() ]
 	highest = max([ p[1] for p in pairs ])
@@ -84,12 +93,18 @@ def get_next_gen(population, generation):
 	print 'avg.   fitness: ', sum([ p[1] for p in pairs ]) / len(pairs)
 	new_pop = {}
 	while len(new_pop) < POPULATION_SIZE:
-		selection = population[random.choice(population.keys())]
-		norm_fitness = selection.fitness / float(highest)
-		if random.random() < norm_fitness:
-			new = Robot(mutate(selection.genome))
-			new.register(generation)
-			new_pop[new.fullname] = new
+		new_genome = get_genome_fitness_proportionate(population)
+		if CROSSOVER_RATE > 0:
+			if random.random() < CROSSOVER_RATE:
+				other_parent = new_genome
+				while other_parent == new_genome:
+					other_parent = get_genome_fitness_proportionate(population)
+				new_genome = one_point_crossover(new_genome, other_parent)
+		if MUTATION_RATE > 0:
+			new_genome = mutate(new_genome)		
+		new = Robot(new_genome)
+		new.register(generation)
+		new_pop[new.fullname] = new
 	return new_pop
 
 def record_fitness(population, filename):
