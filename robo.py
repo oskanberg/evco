@@ -25,10 +25,10 @@ LAME_DERIVATION = """package sample.evolved;\n
 }"""
 
 # NUM_PROCESSES = 4
-POPULATION_SIZE = 10 
+POPULATION_SIZE = 20 
 GENOME_SIZE = 800
 GENERATIONS = 50
-MUTATION_RATE = 0.05
+MUTATION_RATE = 0.1
 ROUNDS = 5
 
 generator = GramGen('robogram.json')
@@ -137,7 +137,8 @@ for generation in xrange(GENERATIONS):
 	for robot in population.itervalues():
 		print robot.fullname + " : " + str(robot.fitness)
 
-	record_fitness(population, '/tmp/fitness_record.csv')
+	record_fitness(population, '/usr/userfs/o/ost500/fitness_record.csv')
 	clean_dir('/usr/userfs/o/ost500/robocode/robots/sample/evolved')
+	clean_dir('/tmp')
 	population = get_next_gen(population, generation + 1)
 	rf.compile_generation(generation + 1)
