@@ -3,7 +3,7 @@ from RobotFactory import RobotFactory
 from RoboBattle import RoboBattle
 
 import csv
-
+import os
 from multiprocessing import Process, Queue
 import random
 
@@ -25,7 +25,7 @@ LAME_DERIVATION = """package sample.evolved;\n
 }"""
 
 # NUM_PROCESSES = 4
-POPULATION_SIZE = 5
+POPULATION_SIZE = 10 
 GENOME_SIZE = 800
 GENERATIONS = 50
 MUTATION_RATE = 0.05
@@ -101,6 +101,15 @@ def test_robot(robot_fullname, q):
 	result = rb.battle([robot_fullname, 'sample.Fire', 'sample.Walls', 'sample.RamFire'], rounds=ROUNDS)
 	q.put((robot_fullname, result[robot_fullname]['total']/float(ROUNDS)))
 
+def clean_dir(folder):
+	for the_file in os.listdir(folder):
+    		file_path = os.path.join(folder, the_file)
+    		try:
+       			if os.path.isfile(file_path):
+            			os.unlink(file_path)
+		except Exception,e:
+			print e
+
 population = {}
 #name:obj pairs
 # create starting population
@@ -129,5 +138,6 @@ for generation in xrange(GENERATIONS):
 		print robot.fullname + " : " + str(robot.fitness)
 
 	record_fitness(population, '/tmp/fitness_record.csv')
+	clean_dir('/usr/userfs/o/ost500/robocode/robots/sample/evolved')
 	population = get_next_gen(population, generation + 1)
 	rf.compile_generation(generation + 1)
