@@ -1,10 +1,12 @@
 
 from GramGen import GramGen
 
-class Robot:
+class SplitRobot(object):
 
 	fitness = 0
-	genome = ''
+	move_genome = ''
+	shoot_genome = ''
+	scan_genome = ''
 	name = ''
 	fullname = ''
 	lame = False
@@ -21,9 +23,9 @@ class Robot:
 		self.rf = robot_factory
 		self.rtype = rtype
 
-		self.move_gen = GramGen('move.json')
-		self.shoot_gen = GramGen('shoot.json')
-		self.scan_gen = GramGen('scanned.json')
+		self.move_gen = GramGen('grammars/move.json')
+		self.shoot_gen = GramGen('grammars/shoot.json')
+		self.scan_gen = GramGen('grammars/scanned.json')
 			
 
 	def register(self, generation):
@@ -42,3 +44,31 @@ class Robot:
 
 	def get_genome(self):
 		return self.move_genome + self.shoot_genome + self.scan_genome
+
+
+class PlainRobot(object):
+
+	fitness = 0
+	genome = ''
+	name = ''
+	fullname = ''
+	lame = False
+	battles_fought = 0
+
+	def __init__(self, genome, robot_factory):
+		self.genome = genome
+		self.fitness = 0
+		self.name = ''
+		self.fullname = ''
+		self.lame = False
+		self.rf = robot_factory
+		self.battles_fought = 0
+		self.generator = GramGen('grammars/robogram.json')
+
+	def register(self, generation):
+		derivation = self.generator.generate_from_seq(self.genome)
+		self.name = self.rf.add_robot(derivation, generation)
+		self.fullname = 'sample.evolved.' + self.name
+
+	def get_genome(self):
+		return self.genome
