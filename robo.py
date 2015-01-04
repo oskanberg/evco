@@ -29,14 +29,15 @@ LAME_DERIVATION = """package sample.evolved;\n
 RECORD_LOCATION = '/home/oliver/fitness_record.csv'
 CLEAN = False
 POPULATION_SIZE = 20 
-# number of bots (excluding tested and sample)
+# number of bots (excluding tested, hof and sample)
 NUM_BOTS_PER_BATTLE = 3
 GENOME_SIZE = 800
-GENERATIONS = 100
+GENERATIONS = 1
 MUTATION_RATE = 0.05
 ROUNDS = 5
 CROSSOVER_RATE = 0.2
 NUM_MOVERS = 3
+HALL_OF_FAME = True
 
 rf = RobotFactory()
 rb = RoboBattle()
@@ -89,11 +90,15 @@ def get_next_gen_ms(population, generation, rtype):
 		new_pop[new.fullname] = new
 	return new_pop
 
+
+hof = []
+
 def get_next_gen(population, generation):
-	pairs = [ (robot.fullname, robot.fitness) for robot in population.itervalues() ]
-	highest = max([ p[1] for p in pairs ])
+	robots = population.values()
+	robots.sort(key=lambda x: x.fitness, reverse=True)
+	highest = robots[0].fitness
 	print 'higest fitness: ', highest
-	print 'avg.   fitness: ', sum([ p[1] for p in pairs ]) / len(pairs)
+	print 'avg.   fitness: ', sum([ r.fitness for r in robots ]) / len(robots)
 	new_pop = {}
 	while len(new_pop) < POPULATION_SIZE:
 		new_genome = get_genome_fitness_proportionate(population)
@@ -105,8 +110,13 @@ def get_next_gen(population, generation):
 				other_parent = get_genome_fitness_proportionate(population)
 				new_genome = one_point_crossover(new_genome, other_parent)
 		if MUTATION_RATE > 0:
-			new_genome = mutate(new_genome)		
+			new_genome = mutate(new_genome)
 		new = PlainRobot(new_genome, rf)
+		new.register(generation)
+		new_pop[new.fullname] = new
+	if HALL_OF_FAME and len(hof) > 0:
+		random_hofer = random.choice(hof).get_genome()
+		new = PlainRobot(random_hofer, rf)
 		new.register(generation)
 		new_pop[new.fullname] = new
 	return new_pop
@@ -198,6 +208,7 @@ def multiprocess_split(movers, shooters):
 	return movers, shooters
 
 def multiprocess_plain(population):
+	exclude = []
 	processes = []
 	q = Queue()
 	for robot in population.itervalues():
@@ -206,13 +217,14 @@ def multiprocess_plain(population):
 		battle_robots = names[:NUM_BOTS_PER_BATTLE]
 		battle_robots.append(robot.fullname)
 		battle_robots.append('sample.Fire')
+		exclude.append('sample.Fire')
 		processes.append(Process(target=coevolve_test, args=(battle_robots,q)))
 		processes[-1].start()
 	for process in processes:
 		process.join()
 	while not q.empty():
 		record = q.get()
-		if 'evolved' in record[0]:
+		if record[0] not in exclude:
 			population[record[0]].fitness += record[1]['total']
 			population[record[0]].battles_fought += 1
 
@@ -272,15 +284,34 @@ def coevolve_plain():
 		robots = population.values()
 		robots.sort(key=lambda x: x.fitness, reverse=True)
 		
-		actual_fitness = test_actual_fitness(robots[0].fullname)
-		print 'actual fitness of ' + robots[0].fullname + ' : ' + str(actual_fitness)
-		record_values([actual_fitness], '/home/oliver/best_actual.csv')
+		robots[0].actual_fitness = test_actual_fitness(robots[0].fullname)
+		print 'actual fitness of ' + robots[0].fullname + ' : ' + str(robots[0].actual_fitness)
+		# hall of fame 
+		if HALL_OF_FAME:
+			if len(hof) > 5:
+				# smallest first
+				if robots[0].actual_fitness > hof[0].actual_fitness:
+					hof[0] = robots[0]
+					hof.sort(key=lambda x: x.fitness)
+			else:
+				# add the best
+				hof.append(robots[0])
 
+			print 'Hall of Fame'
+			for r in hof:
+				print r.fullname + ' : ' + str(r.fitness)
+
+		record_values([robots[0].actual_fitness], '/home/oliver/best_actual.csv')
 		record_fitness(population, RECORD_LOCATION)
 		if CLEAN:
 			clean_dir('/usr/userfs/o/ost500/robocode/robots/sample/evolved')
 			clean_dir('/tmp')
 		population = get_next_gen(population, generation + 1)
 		rf.compile_generation(generation + 1)
+
+	record_values([r.get_genome() for r in hof], '/home/oliver/hof.csv')
+
+if HALL_OF_FAME and CLEAN:
+	print "YOU CAN'T HAVE BOTH HALL OF FAME AND CLEAN"
 
 coevolve_plain()

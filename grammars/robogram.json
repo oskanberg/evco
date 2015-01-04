@@ -28,10 +28,11 @@
         "getNumRounds()", 
         "getNumSentries()", 
         "getOthers()", 
-        "Math.round(<float>)"
+        "Math.round(<double>)"
     ], 
-    "float": [
-        "<literal_float>", 
+    "double": [
+        "<literal_double>", 
+        "(double) <int>",
         "getX()", 
         "getY()", 
         "getVelocity()", 
@@ -45,10 +46,32 @@
         "getGunHeat()", 
         "getRadarHeading()", 
         "getTime()", 
-        "(float) <int>"
+        "(b != null ? b.<bop> : <double>)",
+        "(r != null ? r.<rop> : <double>)",
+        "(w != null ? w.<wop> : <double>)",
+        "(e != null ? e.<eop> : <double>)"
     ], 
+    "eop" : [
+        "getBearing()",
+        "getDistance()",
+        "getEnergy()",
+        "getVelocity()"
+    ],
+    "bop" : [
+        "getBearing()",
+        "getHeading()",
+        "getPower()",
+        "getVelocity()"
+    ],
+    "rop" : [
+        "getBearing()",
+        "getEnergy()"
+    ],
+    "wop" : [
+        "getBearing()"
+    ],
     "numeric": [
-        "<float>", 
+        "<double>", 
         "<int>"
     ], 
     "nz_digit": [
@@ -62,7 +85,7 @@
         "8", 
         "9"
     ], 
-    "literal_float": [
+    "literal_double": [
         "<literal_int>.<fractional>"
     ], 
     "bool": [
@@ -70,7 +93,8 @@
         "<expression_boolean>"
     ], 
     "expression_boolean": [
-        "<expression_boolean_term>"
+        "<expression_boolean_term>",
+        "(r != null ? r.isMyFault() : <bool>)"
     ], 
     "statement": [
         "if (<expression_boolean>) {\n
@@ -87,38 +111,45 @@
     ], 
     "action": [
     	"<action>;<action>",
-        "setAhead(<float>)", 
-        "setBack(<float>)", 
-        "setStop()", 
-        "setResume()", 
-        "setTurnRight(<float>)", 
-        "setTurnLeft(<float>)", 
-        "setTurnGunLeft(<float>)", 
-        "setTurnGunRight(<float>)", 
-        "setTurnRadarLeft(<float>)", 
-        "setTurnRadarLeft(<float>)", 
+        "setAhead(<double>)", 
+        "setBack(<double>)", 
+        "setTurnRight(<double>)", 
+        "setTurnLeft(<double>)", 
+        "setTurnGunLeft(<double>)", 
+        "setTurnGunRight(<double>)", 
+        "setTurnRadarLeft(<double>)", 
+        "setTurnRadarLeft(<double>)", 
         "setAdjustGunForRobotTurn(<bool>)", 
         "setAdjustRadarForRobotTurn(<bool>)", 
         "setAdjustRadarForGunTurn(<bool>)", 
-        "fire(<float>)"
+        "fire(<double>)"
     ], 
-    "m_run": [
-        "<statements>"
-    ], 
-    "main": ["package sample.evolved;\n
+    "main": [
+"   package sample.evolved;\n
     import robocode.*;\n
     public class ##name## extends AdvancedRobot{\n
     public void run() {\n
 		while (true) {\n
-			<m_run>\n
+			<statements>\n
 			execute();\n
 		}\n
 	}\n
-	public void onHitByBullet(HitByBulletEvent e) { }\n
-	public void onHitRobot(HitRobotEvent e) { }\n
-	public void onHitWall(HitWallEvent e) { }\n
+
+    private HitByBulletEvent b = null;\n
+	public void onHitByBullet(HitByBulletEvent b) {\n
+        <statements>\n
+    }\n
+    private HitRobotEvent r = null;\n
+	public void onHitRobot(HitRobotEvent r) {\n
+        <statements>\n
+    }\n
+    private HitWallEvent w = null;\n
+	public void onHitWall(HitWallEvent w) {\n
+        <statements>\n
+    }\n
+    private ScannedRobotEvent e = null;\n
     public void onScannedRobot(ScannedRobotEvent e) {\n
-        fire(1);\n
+        <statements>\n
     }\n
 }"
     ], 

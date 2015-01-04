@@ -54,6 +54,7 @@ class PlainRobot(object):
 	fullname = ''
 	lame = False
 	battles_fought = 0
+	actual_fitness = 0
 
 	def __init__(self, genome, robot_factory):
 		self.genome = genome
@@ -64,6 +65,7 @@ class PlainRobot(object):
 		self.rf = robot_factory
 		self.battles_fought = 0
 		self.generator = GramGen('grammars/robogram.json')
+		self.actual_fitness = 0
 
 	def register(self, generation):
 		derivation = self.generator.generate_from_seq(self.genome)
