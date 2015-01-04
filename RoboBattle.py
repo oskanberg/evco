@@ -68,6 +68,8 @@ robocode.battle.selectedRobots=%s''' % (rounds, ','.join(robots)))
 			tank_name = tank_data[0].split(' ')[1]
 			results[tank_name] = {
 				'total' : int(tank_data[1].split(' ')[0]),
+				'survival' : int(tank_data[2]),
+				'damage' : int(tank_data[4])
 			}
 
 		return results

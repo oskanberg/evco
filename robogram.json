@@ -114,12 +114,12 @@
 			execute();\n
 		}\n
 	}\n
-	public void onScannedRobot(ScannedRobotEvent e) {\n
-		fire(1);\n
-	}\n
 	public void onHitByBullet(HitByBulletEvent e) { }\n
 	public void onHitRobot(HitRobotEvent e) { }\n
 	public void onHitWall(HitWallEvent e) { }\n
+    public void onScannedRobot(ScannedRobotEvent e) {\n
+        fire(1);\n
+    }\n
 }"
     ], 
     "expression_boolean_term": [

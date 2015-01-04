@@ -1,0 +1,123 @@
+{
+  "literal_int":[
+    "<nz_digit><literal_int>",
+    "<digit>"
+  ],
+  "digit":[
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "literal_boolean":[
+    "true",
+    "false"
+  ],
+  "statements":[
+    "<statement><statements>",
+    "<statement>"
+  ],
+  "int":[
+    "<literal_int>",
+    "getNumRounds()",
+    "getNumSentries()",
+    "getOthers()",
+    "Math.round(<double>)"
+  ],
+  "double":[
+    "<literal_int>.<fractional>",
+    "getX()",
+    "getY()",
+    "getVelocity()",
+    "getHeight()",
+    "getHeading()",
+    "getEnergy()",
+    "getGunHeading()",
+    "getGunCoolingRate()",
+    "getBattleFieldHeight()",
+    "getBattleFieldWidth()",
+    "getGunHeat()",
+    "getRadarHeading()",
+    "getTime()",
+    "(double) <int>"
+  ],
+  "numeric":[
+    "<double>",
+    "<int>"
+  ],
+  "nz_digit":[
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "bool":[
+    "<literal_boolean>",
+    "<expression_boolean>"
+  ],
+  "expression_boolean":[
+    "<expression_boolean_term>"
+  ],
+  "statement":[
+    "if (<expression_boolean>) {\n
+    <action>;\n
+} else {\n
+    <action>;\n
+}",
+    "<action>;",
+    ""
+
+  ],
+  "fractional":[
+    "<digit>",
+    "<digit><digit>"
+  ],
+  "action":[
+    "<action>;<action>",
+    "setAhead(<double>)",
+    "setBack(<double>)",
+    "setStop()",
+    "setResume()",
+    "setTurnRight(<double>)",
+    "setTurnLeft(<double>)"
+  ],
+  "expression_boolean_term":[
+    "<numeric> == <numeric>",
+    "<numeric> != <numeric>",
+    "<numeric> > <numeric>",
+    "<numeric> >= <numeric>",
+    "<numeric> < <numeric>",
+    "<numeric> <= <numeric>"
+  ],
+  "main":[
+    "package sample.evolved;\n
+import robocode.*;\n
+public class ##name## extends AdvancedRobot {\n
+    public void run() {\n
+        setAdjustGunForRobotTurn(true);\n
+        setAdjustRadarForRobotTurn(true);\n
+        while (true) {\n
+            shootStep();\n
+            moveStep();\n
+            execute();\n
+        }\n
+    }\n
+    private void moveStep() {\n
+        <statements>\n
+    }\n
+    private void shootStep() {}\n
+    public void onScannedRobot(ScannedRobotEvent e) {}\n
+}"
+  ]
+}
