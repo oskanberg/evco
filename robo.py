@@ -1,3 +1,4 @@
+#!/usr/bin/python
 
 from RobotFactory import RobotFactory
 from RoboBattle import RoboBattle
@@ -26,13 +27,14 @@ LAME_DERIVATION = """package sample.evolved;\n
 }"""
 
 # RECORD_LOCATION = '/usr/userfs/o/ost500/fitness_record.csv'
+LOAD_HOF = True
 RECORD_LOCATION = '/home/oliver/fitness_record.csv'
 CLEAN = False
 POPULATION_SIZE = 20 
 # number of bots (excluding tested, hof and sample)
-NUM_BOTS_PER_BATTLE = 3
+NUM_BOTS_PER_BATTLE = 0
 GENOME_SIZE = 800
-GENERATIONS = 1
+GENERATIONS = 300
 MUTATION_RATE = 0.05
 ROUNDS = 5
 CROSSOVER_RATE = 0.2
@@ -211,22 +213,25 @@ def multiprocess_plain(population):
 	exclude = []
 	processes = []
 	q = Queue()
-	for robot in population.itervalues():
-		names = population.keys()
-		random.shuffle(names)
-		battle_robots = names[:NUM_BOTS_PER_BATTLE]
-		battle_robots.append(robot.fullname)
-		battle_robots.append('sample.Fire')
-		exclude.append('sample.Fire')
-		processes.append(Process(target=coevolve_test, args=(battle_robots,q)))
-		processes[-1].start()
-	for process in processes:
-		process.join()
-	while not q.empty():
-		record = q.get()
-		if record[0] not in exclude:
-			population[record[0]].fitness += record[1]['total']
-			population[record[0]].battles_fought += 1
+	for enemy in ['sample.Fire', 'squigsoft.SquigBot2_8*', 'sample.Crazy']:
+		for robot in population.itervalues():
+			names = population.keys()
+			random.shuffle(names)
+			battle_robots = names[:NUM_BOTS_PER_BATTLE]
+			battle_robots.append(robot.fullname)
+			battle_robots.append('sample.Fire')
+			exclude.append('sample.Fire')
+			battle_robots.append(enemy)
+			exclude.append(enemy)
+			processes.append(Process(target=coevolve_test, args=(battle_robots,q)))
+			processes[-1].start()
+		for process in processes:
+			process.join()
+		while not q.empty():
+			record = q.get()
+			if record[0] not in exclude:
+				population[record[0]].fitness += record[1]['total']
+				population[record[0]].battles_fought += 1
 
 def coevolve_movers_shooters():
 	# name:obj pairs
@@ -266,9 +271,26 @@ def coevolve_movers_shooters():
 		shooters = get_next_gen_ms(shooters, generation + 1, 'shooter')
 		rf.compile_generation(generation + 1)
 
+
+def get_saved_hof_genomes():
+	genomes = []
+	with open('results/hall_of_fame_genomes.csv', 'r') as f:
+		r = csv.reader(f)
+		for row in r:
+			genomes.append([int(r) for r in row])
+	return genomes
+
 def coevolve_plain():
 	population = {}
-	for i in xrange(POPULATION_SIZE):
+	num_hofers = 0
+	if LOAD_HOF:
+		for genome in get_saved_hof_genomes():
+			new = PlainRobot(genome, rf)
+			new.register(0)
+			population[new.fullname] = new
+			num_hofers += 1
+
+	for i in xrange(POPULATION_SIZE - num_hofers):
 		new = PlainRobot(generate_random_genome(GENOME_SIZE), rf)
 		new.register(0)
 		population[new.fullname] = new
@@ -284,8 +306,9 @@ def coevolve_plain():
 		robots = population.values()
 		robots.sort(key=lambda x: x.fitness, reverse=True)
 		
-		robots[0].actual_fitness = test_actual_fitness(robots[0].fullname)
-		print 'actual fitness of ' + robots[0].fullname + ' : ' + str(robots[0].actual_fitness)
+		# robots[0].actual_fitness = test_actual_fitness(robots[0].fullname)
+		robots[0].actual_fitness = robots[0].fitness
+		# print 'actual fitness of ' + robots[0].fullname + ' : ' + str(robots[0].actual_fitness)
 		# hall of fame 
 		if HALL_OF_FAME:
 			if len(hof) > 5:
@@ -293,6 +316,7 @@ def coevolve_plain():
 				if robots[0].actual_fitness > hof[0].actual_fitness:
 					hof[0] = robots[0]
 					hof.sort(key=lambda x: x.fitness)
+					record_values(hof[0].get_genome(), '/home/oliver/step_hof.csv')					
 			else:
 				# add the best
 				hof.append(robots[0])
